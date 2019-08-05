@@ -1,26 +1,47 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import Header from './components/Header.js';
+import * as apiStore from './APIs/APIStore.js';
+import Todos from './components/Todos.js';
+import AddTodo from './components/AddTodo.js';
+import PropTypes from 'prop-types';
+import LoadingSpinner from './components/LoadingSpinner.js';
+import { connect } from 'react-redux';
+import { getToDoList } from './actions'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  constructor(props){
+    super(props);
+  }
+
+  componentDidMount(){
+    apiStore.getTodos()
+    .then((response) => {
+      this.props.getToDoList(response.data);
+    })
+    .catch(function(error){
+      console.log(error);
+    })
+  }
+
+  showLoader(){
+    this.setState({
+      loading: true
+    })
+  }
+  editTodo(id){
+    this.setState({
+     editId: id
+    })
+  }
+
+  render(){
+    return (<div> 
+      <Header/> 
+      <AddTodo/>
+      {/* {this.state.loading ? <LoadingSpinner /> : <></>} */}
+      <Todos/>
+    </div>)
+  }
 }
-
-export default App;
+export default  connect(null,{getToDoList}) (App);
